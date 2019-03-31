@@ -1,5 +1,7 @@
 package util
 
+import graph.City
+
 import scala.io.Source
 
 object FileProcessor {
@@ -8,9 +10,9 @@ object FileProcessor {
     * @param fileName
     * @return
     */
-  def fileReader(fileName: String): Map[String, (Double, Double)] = {
+  def fileReader(fileName: String): List[City] = {
     // No ANSI encoding!
     val lines: List[String] = Source.fromFile(fileName)("Unicode").getLines.toList
-    lines.map(x => {val a = x.split(' '); (a(0).toString, (a(1).toDouble, a(2).toDouble))}).toMap
+    lines.map(x => {val a = x.split(' '); new City(a(0).toString, (a(1).toDouble, a(2).toDouble))})
   }
 }

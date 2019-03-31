@@ -1,5 +1,7 @@
 package util
 
+import graph.{City, Edges}
+
 import math._
 
 object Util {
@@ -17,12 +19,12 @@ object Util {
 
   /**
     * Get all edges of cities
-    * @param cityLocs location of cites
+    * @param cities
     * @return edges
     */
-  def getEdge(cityLocs: Map[String, (Double, Double)]): Map[Set[String], Double] = {
-    val pairs: List[List[String]] = cityLocs.keys.toList.combinations(2).toList
-    pairs.map(x => (Set(x(0), x(1)), distance(cityLocs(x(0)), cityLocs(x(1))))).toMap
+  def getEdge(cities: List[City]): Edges = {
+    val pairs: List[List[City]] = cities.combinations(2).toList
+    new Edges(pairs.map(x => (Set(x(0), x(1)), distance(x(0).loc, x(1).loc))).toMap)
   }
 
   /**
@@ -31,12 +33,12 @@ object Util {
     * @param citySeq travel course
     * @return
     */
-  def traverse(edges: Map[Set[String], Double], citySeq: List[String]): Double = {
+  def traverse(edges: Edges, citySeq: List[City]): Double = {
     val seq2 = citySeq.tail ::: List(citySeq.head)
-    val pairs: List[Set[String]] = citySeq.zip(seq2).map(x => Set(x._1, x._2))
+    val pairs: List[(City, City)] = citySeq.zip(seq2)
     val road: List[Double] = for (
       p <- pairs;
-      edge = edges(p)
+      edge = edges(p._1, p._2)
     ) yield edge
     road.sum
   }
