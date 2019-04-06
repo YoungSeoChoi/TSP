@@ -15,16 +15,28 @@ class DPSolver extends Solver {
     topDown(cities.head, cities.tail.toSet, cities.head, edges)
   }
 
-  // Actually, Because we use top down algorithm, we do not have to calculate all edges between cities
+  /**
+    * Solve the tsp using TopDown algorithm. Because result of function is always same at the same parameter,
+    * we can use memoization technique for caching purpose.
+    * F(s, tV, d) : s is start city, tV is set of city that have to visit, d is destination city
+    * F(s, {}, d) = edge(s to d)
+    * F(s, tV, d) = min(F(s, tV - {x}, x) + edge(x to d)) 이 점화식을 이용한다!
+    * @param start start city
+    * @param toVisit set of city that will be visited
+    * @param dest destination city
+    * @param edges set of edge
+    * @return sequence of city, length of travel
+    */
   private def topDown(start: City, toVisit: Set[City], dest: City, edges: Edges): (List[City], Double) = {
     val mem: collection.mutable.Map[(Set[City], City), (List[City], Double)] = collection.mutable.Map()
-    for ( i <- toVisit - start ) {
-      val edge = edges(start, i)
-      mem += ((Set(): Set[City], i) -> (i :: Nil, edge))
-    }
 
+    // TODO tailrec
     def loop(start: City, toVisit: Set[City], dest: City): (List[City], Double) = {
-      if (toVisit.isEmpty) mem((Set(), dest))
+      if (toVisit.isEmpty) {
+        val res = (dest :: Nil, edges(start, dest))
+        mem((Set(), dest)) = res
+        res
+      }
       else {
         mem.get(toVisit, dest) match {
           case Some(p) => p
@@ -41,5 +53,4 @@ class DPSolver extends Solver {
     }
     loop(start, toVisit, dest)
   }
-
 }
