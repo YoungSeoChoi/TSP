@@ -7,8 +7,8 @@ import scala.io.Source
 object FileProcessor {
   /**
     * Read the file that has information of city location
-    * @param fileName
-    * @return
+    * @param fileName input filename
+    * @return list of city
     */
   def fileReader(fileName: String): List[City] = {
     // No ANSI encoding!

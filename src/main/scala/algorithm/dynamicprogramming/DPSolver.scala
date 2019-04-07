@@ -88,7 +88,7 @@ class DPSolver extends Solver {
       }
       else {
         // TODO Is performance of this algorithm same as imperative style?
-        // Use Stream for performance purpos
+        // Use Stream for performance purpose
         // Move one step
         val acc1: Stream[(List[City], Double)] = acc.toStream.flatMap(x => {
           val left: Set[City] = (toVisit -- x._1._1) - x._1._2

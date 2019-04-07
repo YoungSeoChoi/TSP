@@ -8,7 +8,7 @@ import graph.{City, Edges}
 trait Solver {
   /**
     * Solve the TSP with respective algorithm
-    * @param cities
+    * @param cities list of city
     * @param edges given map between two cities and distance of those
     * @return total distance that traveler move
     */
