@@ -1,4 +1,6 @@
+import algorithm.acs.ACSSolver
 import algorithm.bruteforce.BruteSolver
+import algorithm.dynamicprogramming.DPSolver
 import graph.City
 import util.{FileProcessor, Util}
 
@@ -8,7 +10,8 @@ object Main {
     val cities: List[City] = FileProcessor.fileReader("city.txt")
     val cityEdges = Util.getEdge(cities)
 
-    val salesMan = new BruteSolver
-    println(salesMan.solve(cities, cityEdges))
+    val salesManB = new BruteSolver(cities, cityEdges)
+    val salesManDP = new DPSolver(cities, cityEdges)
+    val salesManACS = new ACSSolver(cities, cityEdges)
   }
 }
