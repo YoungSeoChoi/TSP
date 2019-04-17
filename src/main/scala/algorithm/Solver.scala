@@ -12,5 +12,5 @@ abstract class Solver(cities: List[City], edges: Edges) {
     * @param edges given map between two cities and distance of those
     * @return total distance that traveler move
     */
-  def solve(): (List[City], Double)
+  def solve: (List[City], Double)
 }
