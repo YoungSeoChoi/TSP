@@ -14,7 +14,7 @@ class ACSSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) 
     * @param edges  given map between two cities and distance of those
     * @return total distance that traveler move
     */
-  override def solve(): (List[City], Double) = {
+  override def solve: (List[City], Double) = {
     val pheromone0: Double = getPheromone0(10)
     val pheromones: Pheromones = getPheromones(pheromone0)
     // From the paper, the best number of ants is 10
