@@ -20,7 +20,7 @@ class ACSSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) 
     // From the paper, the best number of ants is 10
     val ants: List[Ant] = initialize(10)
 
-    tour(ants, pheromones, pheromone0)
+    tour(ants, pheromones, pheromone0, 100)
   }
 
   /**
@@ -68,12 +68,10 @@ class ACSSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) 
   }
 
   // FROMHERE Change tour function to recursive with end condition (ex. after # of iterations...)
-  def tour(ants: List[Ant], pheromones: Pheromones, pheromone0: Double): (List[City], Double) = {
+  def tour(ants: List[Ant], pheromones: Pheromones, pheromone0: Double, iterations: Int): (List[City], Double) = {
     @tailrec
     def loop(n: Int, pheromones: Pheromones, bestTrace: List[City], bestLength: Double): (List[City], Double) = {
-      println("still...")
-      println(bestTrace, bestLength)
-      if (n == 100) (bestTrace, bestLength)
+      if (n == 0) (bestTrace, bestLength)
       else {
         // ACS State Transition
         // use outer ants because after the tour is over, all ants will come back start city
@@ -90,11 +88,11 @@ class ACSSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) 
         })
         val ffPheromones: Pheromones = Pheromones(pheromoneMap)
 
-        loop(n + 1, ffPheromones, bestT, bestL)
+        loop(n - 1, ffPheromones, bestT, bestL)
       }
     }
 
-    loop(0, pheromones, Nil, Float.PositiveInfinity)
+    loop(iterations, pheromones, Nil, Float.PositiveInfinity)
   }
 
   def step(ants: List[Ant], pheromones: Pheromones, pheromone0: Double): (List[Ant], Pheromones) = {
