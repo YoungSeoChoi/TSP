@@ -6,14 +6,14 @@ import graph.{City, Edges}
 import scala.annotation.tailrec
 
 
-class DPSolver extends Solver {
+class DPSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) {
   /**
     * solve the TSP using Dynamic Programming
     * @param cities list of city
     * @param edges given map between two cities and distance of those
     * @return total distance that traveler move
     */
-  override def solve(cities: List[City], edges: Edges): (List[City], Double) = {
+  override def solve(): (List[City], Double) = {
 //    topDown(cities.head, cities.tail.toSet, edges)
     bottomUp(cities.head, cities.tail.toSet, edges)
   }
