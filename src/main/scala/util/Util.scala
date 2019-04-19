@@ -42,4 +42,22 @@ object Util {
     ) yield edge
     road.sum
   }
+
+  /**
+    * Traverse given travel course with string list
+    * @param edges set of edges
+    * @param cities list of cities
+    * @param stringSeq string course
+    * @return length of travel course
+    */
+  def traverse(edges: Edges, cities: List[City], stringSeq: List[String]): Double = {
+    val citySeq: List[City] = stringSeq.map(x => cities.find(_.name == x).get)
+    val seq2 = citySeq.tail ::: List(citySeq.head)
+    val pairs: List[(City, City)] = citySeq.zip(seq2)
+    val road: List[Double] = for (
+      p <- pairs;
+      edge = edges(p._1, p._2)
+    ) yield edge
+    road.sum
+  }
 }
