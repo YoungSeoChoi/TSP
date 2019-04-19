@@ -14,8 +14,8 @@ class DPSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) {
     * @return total distance that traveler move
     */
   override def solve: (List[City], Double) = {
-//    topDown(cities.head, cities.tail.toSet, edges)
-    bottomUp(cities.head, cities.tail.toSet, edges)
+    topDown(cities.head, cities.tail.toSet, edges)
+//    bottomUp(cities.head, cities.tail.toSet, edges)
   }
 
   /**
