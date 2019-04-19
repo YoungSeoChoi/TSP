@@ -3,7 +3,7 @@ package util
 import scala.compat.Platform
 
 object Timer {
-  def getTime(p: => Unit): Unit = {
+  def getTime(p: => Unit) = {
     val start = Platform.currentTime
     p
     val end = Platform.currentTime

@@ -23,7 +23,7 @@ class ACSSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) 
 
   /**
     * Get initial pheromone tau0, tau0 = 1 / (m * length of nearest neighbor heuristic).
-    * (the information of prameter is from ACS paper)
+    * (the information of parameter is from ACS paper)
     * @param m number of ants
     * @return initial amount of pheromone
     */

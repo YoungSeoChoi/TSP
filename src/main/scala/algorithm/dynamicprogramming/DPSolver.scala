@@ -9,8 +9,6 @@ import scala.annotation.tailrec
 class DPSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) {
   /**
     * solve the TSP using Dynamic Programming
-    * @param cities list of city
-    * @param edges given map between two cities and distance of those
     * @return total distance that traveler move
     */
   override def solve: (List[City], Double) = {
