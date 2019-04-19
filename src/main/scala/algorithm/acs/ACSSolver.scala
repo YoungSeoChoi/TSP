@@ -10,8 +10,6 @@ import scala.util.Random
 class ACSSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) {
   /**
     * Solve the TSP with ant colony optimization algorithm (Ant Colony System)
-    * @param cities list of city
-    * @param edges  given map between two cities and distance of those
     * @return total distance that traveler move
     */
   override def solve: (List[City], Double) = {
@@ -27,8 +25,6 @@ class ACSSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) 
     * Get initial pheromone tau0, tau0 = 1 / (m * length of nearest neighbor heuristic).
     * (the information of prameter is from ACS paper)
     * @param m number of ants
-    * @param cities list of cities
-    * @param edges set of edges
     * @return initial amount of pheromone
     */
   def getPheromone0(m: Int): Double = {
@@ -47,7 +43,6 @@ class ACSSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) 
 
   /**
     * Get the initialized pheromones
-    * @param cities list of cities
     * @param pheromone0 initial amount of pheromone
     * @return pheromones map
     */
@@ -59,7 +54,6 @@ class ACSSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) 
   /**
     * Initialize ants. Each ant starts from random city
     * @param m number of ants
-    * @param cities list of cities
     * @return list of ants
     */
   def initialize(m: Int): List[Ant] = {
@@ -67,7 +61,14 @@ class ACSSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) 
     randCity.map(x => Ant(x, List(x), 0, x))
   }
 
-  // FROMHERE Change tour function to recursive with end condition (ex. after # of iterations...)
+  /**
+    * Ant Colony System. Global pheromone update is from ACS paper. 1 iteration = 1 tour all cities
+    * @param ants list of ants
+    * @param pheromones pheromone information
+    * @param pheromone0 initial pheromone (For local pheromone update)
+    * @param iterations end condition
+    * @return best city sequence and length
+    */
   def tour(ants: List[Ant], pheromones: Pheromones, pheromone0: Double, iterations: Int): (List[City], Double) = {
     @tailrec
     def loop(n: Int, pheromones: Pheromones, bestTrace: List[City], bestLength: Double): (List[City], Double) = {
@@ -95,6 +96,13 @@ class ACSSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) 
     loop(iterations, pheromones, Nil, Float.PositiveInfinity)
   }
 
+  /**
+    * Move city to next city with local pheromone update.
+    * @param ants list of ants
+    * @param pheromones pheromone information
+    * @param pheromone0 initial pheromone (For local update)
+    * @return result of list of ants after one step moved
+    */
   def step(ants: List[Ant], pheromones: Pheromones, pheromone0: Double): (List[Ant], Pheromones) = {
     @tailrec
     def loop(n: Int, ants: List[Ant], pheromones: Pheromones): (List[Ant], Pheromones) = {
@@ -136,10 +144,23 @@ class ACSSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) 
     loop(cities.length - 1, ants, pheromones)
   }
 
+  /**
+    * Get the score of edge. It is proportion to amount of pheromone and reciprocal of length
+    * @param start start city
+    * @param dest destination city
+    * @param pheromones pheromone information
+    * @return score of edge
+    */
   private def getPower(start: City, dest: City, pheromones: Pheromones): Double = {
     pheromones(start, dest) * math.pow(1 / edges(start, dest), 2)
   }
 
+  /**
+    * Choose the next destination city with given probability
+    * @param prob probability list
+    * @param rand given random number
+    * @return next city
+    */
   @tailrec
   private def stochasticSearch(prob: List[(City, Double)], rand: Double): City = {
     val c = prob.head
