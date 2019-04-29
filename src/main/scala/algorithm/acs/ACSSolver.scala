@@ -128,9 +128,10 @@ class ACSSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) 
             Ant(next, next :: a.trace, a.length + edges(a.now, next), a.start)
           } else { // exploration
             val rand: Double = Random.nextDouble()
-            val left: Set[City] = cities.toSet -- a.trace.toSet
+            val left: Stream[City] = (cities.toSet -- a.trace.toSet).toStream
             val powerSum: Double = left.map(getPower(a.now, _, pheromones)).sum
-            val prob: List[(City, Double)] = left.map(x => (x, getPower(a.now, x, pheromones) / powerSum)).toList
+            // Use the stream. We don't have to calculate all prob if sum of prob already bigger than random value
+            val prob: Stream[(City, Double)] = left.map(x => (x, getPower(a.now, x, pheromones) / powerSum))
             val next: City = stochasticSearch(prob, rand)
             pheromoneBuilder(Set(a.now, next)) = 0.9 * pheromones(a.now, next) + 0.1 * pheromone0
             Ant(next, next :: a.trace, a.length + edges(a.now, next), a.start)
@@ -162,7 +163,7 @@ class ACSSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) 
     * @return next city
     */
   @tailrec
-  private def stochasticSearch(prob: List[(City, Double)], rand: Double): City = {
+  private def stochasticSearch(prob: Stream[(City, Double)], rand: Double): City = {
     val c = prob.head
     if (rand < c._2) c._1
     else stochasticSearch(prob.tail, rand - c._2)
