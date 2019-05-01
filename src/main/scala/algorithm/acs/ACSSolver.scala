@@ -104,45 +104,45 @@ class ACSSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) 
     * @return result of list of ants after one step moved
     */
   def step(ants: List[Ant], pheromones: Pheromones, pheromone0: Double): (List[Ant], Pheromones) = {
-    @tailrec
-    def loop(n: Int, ants: List[Ant], pheromones: Pheromones): (List[Ant], Pheromones) = {
-      // XXX local update 때문에 일단 빌더를 썼는데 내 생각에는 update 함수만 분리한 다음 마지막에 pheromone에 함수들을 한꺼번에 적용하는 것을 어떨까??
-      val pheromoneBuilder: mutable.Map[Set[City], Double] = mutable.Map(pheromones.pheromones.toSeq: _*)
 
+    val pheromoneBuilder: mutable.Map[Set[City], Double] = mutable.Map(pheromones.pheromones.toSeq: _*)
+
+
+    @tailrec
+    def loop(n: Int, ants: List[Ant]): List[Ant] = {
+      // XXX local update 때문에 일단 빌더를 썼는데 내 생각에는 update 함수만 분리한 다음 마지막에 pheromone에 함수들을 한꺼번에 적용하는 것을 어떨까??
       if (n == 0) {
         val b: List[Ant] = ants.map(x => {
           // Local update
-          pheromoneBuilder(Set(x.now, x.start)) = 0.9 * pheromones(x.now, x.start) + 0.1 * pheromone0
+          pheromoneBuilder(Set(x.now, x.start)) = 0.9 * pheromoneBuilder(Set(x.now, x.start)) + 0.1 * pheromone0
           // last destination is start position. start position is not included in trace
           Ant(x.start, x.trace, x.length + edges(x.now, x.start), x.start)
         })
-        val q: Pheromones = Pheromones(Map(pheromoneBuilder.toSeq: _*))
-        (b, q)
+        b
       }
       else {
         val b: List[Ant] = ants.map(a => {
           if (Random.nextDouble <= 0.9) { // exploitation
             val left: Set[City] = cities.toSet -- a.trace.toSet
-            val next: City = left.maxBy(getPower(a.now, _, pheromones))
-            pheromoneBuilder(Set(a.now, next)) = 0.9 * pheromones(a.now, next) + 0.1 * pheromone0
+            val next: City = left.maxBy(getPower(a.now, _, pheromoneBuilder))
+            pheromoneBuilder(Set(a.now, next)) = 0.9 * pheromoneBuilder(Set(a.now, next)) + 0.1 * pheromone0
             Ant(next, next :: a.trace, a.length + edges(a.now, next), a.start)
           } else { // exploration
             val rand: Double = Random.nextDouble()
             val left: Stream[City] = (cities.toSet -- a.trace.toSet).toStream
-            val powerSum: Double = left.map(getPower(a.now, _, pheromones)).sum
+            val powerSum: Double = left.map(getPower(a.now, _, pheromoneBuilder)).sum
             // Use the stream. We don't have to calculate all prob if sum of prob already bigger than random value
-            val prob: Stream[(City, Double)] = left.map(x => (x, getPower(a.now, x, pheromones) / powerSum))
+            val prob: Stream[(City, Double)] = left.map(x => (x, getPower(a.now, x, pheromoneBuilder) / powerSum))
             val next: City = stochasticSearch(prob, rand)
-            pheromoneBuilder(Set(a.now, next)) = 0.9 * pheromones(a.now, next) + 0.1 * pheromone0
+            pheromoneBuilder(Set(a.now, next)) = 0.9 * pheromoneBuilder(Set(a.now, next)) + 0.1 * pheromone0
             Ant(next, next :: a.trace, a.length + edges(a.now, next), a.start)
           }
         })
-        val q: Pheromones = Pheromones(Map(pheromoneBuilder.toSeq: _*))
-        loop(n - 1, b, q)
+        loop(n - 1, b)
       }
     }
 
-    loop(cities.length - 1, ants, pheromones)
+    (loop(cities.length - 1, ants), Pheromones(Map(pheromoneBuilder.toSeq: _*)))
   }
 
   /**
@@ -152,8 +152,8 @@ class ACSSolver(cities: List[City], edges: Edges) extends Solver(cities, edges) 
     * @param pheromones pheromone information
     * @return score of edge
     */
-  private def getPower(start: City, dest: City, pheromones: Pheromones): Double = {
-    pheromones(start, dest) * math.pow(1 / edges(start, dest), 2)
+  private def getPower(start: City, dest: City, pheromones: mutable.Map[Set[City], Double]): Double = {
+    pheromones(Set(start, dest)) * math.pow(1 / edges(start, dest), 2)
   }
 
   /**
