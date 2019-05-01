@@ -1,4 +1,4 @@
-name := "Muscle"
+name := "TSP"
 
 version := "0.1"
 
